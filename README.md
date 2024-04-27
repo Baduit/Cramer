@@ -1,2 +1,6 @@
-# Cramr
-Commit retriever after merge rebase
+# Cramer
+Commit
+Retriever
+After
+MErge
+Rebase
