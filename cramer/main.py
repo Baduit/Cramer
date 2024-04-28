@@ -5,6 +5,9 @@ import click
 from github import Auth, Github, Commit, Consts
 from github.Commit import Commit
 
+from .coal import Coal
+from .print import print_json, print_text, print_toml
+
 
 def read_token(token_path: str) -> str:
 	with open(token_path, "r") as f:
@@ -23,14 +26,6 @@ def find_commit_equivalent_in_set(left: Commit, pr_commits: Set[Commit]) -> Comm
 			return right
 	else:
 		return None
-
-
-@dataclass
-class Coal:
-	head_branch_name: str
-	target_branch_name: str
-	commits_in_target: Set[Commit]
-	commits_not_found: List[Commit]
 
 
 def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
@@ -84,7 +79,11 @@ def main(repo, pr, hostname, token_path, format_output):
 
 	with Github(auth=auth, base_url=base_url) as g:
 		coal = crame(g, pr, repo)
-		if coal.commits_not_found:
-			print(f"The following commits were not found in branch {coal.target_branch_name}: {coal.commits_not_found}")
-
-		print(f"The following commits were foundin branch {coal.target_branch_name}: {coal.commits_in_target}")
+		if format_output == "text":
+			print_text(coal)
+		elif format_output == "json":
+			print_json(coal)
+		elif format_output == "toml":
+			print_toml(coal)
+		else:
+			assert False, "It should not be possible to reach here"
