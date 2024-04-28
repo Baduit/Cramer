@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Set
 
+import click
 from github import Auth, Github, Commit, Consts
 from github.Commit import Commit
 
@@ -69,3 +70,21 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
 		commits_not_found=commits_not_found
 	)
 
+
+@click.command()
+@click.option("--repo", "-r", required=True, type=str, help="Github repository. Example: 'Baduit/Cramer'")
+@click.option("--pr", "-p", required=True, type=int, help="Id of a PR")
+@click.option("--hostname", "-h", type=str, help="Hostname,  useful for github entrerprise with custome hostname")
+@click.option("--token-path", "-t", type=str, help="Path of the file where the token is stored")
+@click.option("--format-output", "-f", type=click.Choice(["text", "json", "toml"], case_sensitive=False), default="text", help="Format of the output")
+def main(repo, pr, hostname, token_path, format_output):
+	token = read_token(token_path)
+	auth = Auth.Token(token)
+	base_url = f"https://{hostname}/api/v3" if hostname else Consts.DEFAULT_BASE_URL
+
+	with Github(auth=auth, base_url=base_url) as g:
+		coal = crame(g, pr, repo)
+		if coal.commits_not_found:
+			print(f"The following commits were not found in branch {coal.target_branch_name}: {coal.commits_not_found}")
+
+		print(f"The following commits were foundin branch {coal.target_branch_name}: {coal.commits_in_target}")
