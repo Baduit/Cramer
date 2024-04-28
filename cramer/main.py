@@ -6,7 +6,7 @@ from github import Auth, Github, Commit, Consts
 from github.Commit import Commit
 
 from .coal import Coal
-from .print import print_json, print_text, print_toml
+from .print import print_json, print_rich, print_text, print_toml
 
 
 def read_token(token_path: str) -> str:
@@ -71,7 +71,7 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
 @click.option("--pr", "-p", required=True, type=int, help="Id of a PR")
 @click.option("--hostname", "-h", type=str, help="Hostname,  useful for github entrerprise with custome hostname")
 @click.option("--token-path", "-t", type=str, help="Path of the file where the token is stored")
-@click.option("--format-output", "-f", type=click.Choice(["text", "json", "toml"], case_sensitive=False), default="text", help="Format of the output")
+@click.option("--format-output", "-f", type=click.Choice(["text", "json", "toml", "rich"], case_sensitive=False), default="rich", help="Format of the output")
 def main(repo, pr, hostname, token_path, format_output):
 	token = read_token(token_path)
 	auth = Auth.Token(token)
@@ -85,5 +85,7 @@ def main(repo, pr, hostname, token_path, format_output):
 			print_json(coal)
 		elif format_output == "toml":
 			print_toml(coal)
+		elif format_output == "rich":
+			print_rich(coal)
 		else:
 			assert False, "It should not be possible to reach here"

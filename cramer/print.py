@@ -4,8 +4,50 @@ from typing import Dict, List
 import json
 import toml
 
+from rich.console import Console
+from rich.table import Table
+from rich.tree import Tree
+
 from .coal import Coal
 from github.Commit import Commit
+
+
+def print_rich(result: Coal):
+	console = Console()
+	tree = Tree("")
+
+	branches_branch = tree.add(":evergreen_tree: Branches")
+
+	head_branch = branches_branch.add(":exploding_head: Head")
+	head_branch.add(f"[bold]{result.head_branch_name}[/bold]")
+
+	head_branch = branches_branch.add(":dart: Base")
+	head_branch.add(f"[bold]{result.target_branch_name}[/bold]")
+
+	commit_branch = tree.add(":memo: [bold]Commits[/bold]")
+	# Found
+	found_table = Table(show_header=True, header_style="bold green")
+	found_table.add_column("Sha")
+	found_table.add_column("Commit message")
+	found_table.add_column("Github url")
+	for commit in result.commits_in_target:
+		found_table.add_row(commit.sha, commit.commit.message, f"[blue]{commit.html_url}[/blue]")
+	found_branch = commit_branch.add(":green_circle: [green]Found[/green]")
+	found_branch.add(found_table)
+
+	# Missing
+	if result.commits_not_found:
+		missing_table = Table(show_header=True, header_style="bold red")
+		missing_table.add_column("Sha")
+		missing_table.add_column("Commit message")
+		missing_table.add_column("Github url")
+		for commit in result.commits_not_found:
+			missing_table.add_row(commit.sha, commit.commit.message, f"[blue]{commit.html_url}[/blue]")
+		missing_branch = commit_branch.add(":red_circle: [red]Missing[/red]")
+		missing_branch.add(missing_table)
+
+	console.print(tree)
+
 
 def print_text(result: Coal):
 	print(f"Head: {result.head_branch_name}")
@@ -18,8 +60,6 @@ def print_text(result: Coal):
 		print("Missing:")
 		for missing in result.commits_not_found:
 			print(f"\tsha: {missing.sha} message: {missing.commit.message} url: {found.html_url}")
-
-
 
 
 def extract_commit_info(commits: Iterable[Commit]) -> List[Dict[str, str]]:
