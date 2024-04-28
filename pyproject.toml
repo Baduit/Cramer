@@ -11,6 +11,7 @@ python = "^3.10"
 click = "^8.1.7"
 pygithub = "^2.3.0"
 toml = "^0.10.2"
+rich = "^13.7.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.2"
