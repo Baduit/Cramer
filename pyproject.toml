@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "cramer"
+version = "0.1.0"
+description = "Retrieve commit between branches when using merge rebase strategy for PR"
+authors = ["Baduit"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "^8.1.7"
+pygithub = "^2.3.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
