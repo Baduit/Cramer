@@ -73,8 +73,7 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
 @click.option("--token-path", "-t", type=str, help="Path of the file where the token is stored")
 @click.option("--format-output", "-f", type=click.Choice(["text", "json", "toml", "rich"], case_sensitive=False), default="rich", help="Format of the output")
 def main(repo, pr, hostname, token_path, format_output):
-	token = read_token(token_path)
-	auth = Auth.Token(token)
+	auth = Auth.Token(read_token(token_path)) if token_path else None
 	base_url = f"https://{hostname}/api/v3" if hostname else Consts.DEFAULT_BASE_URL
 
 	with Github(auth=auth, base_url=base_url) as g:
