@@ -69,7 +69,7 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
 @click.command()
 @click.option("--repo", "-r", required=True, type=str, help="Github repository. Example: 'Baduit/Cramer'")
 @click.option("--pr", "-p", required=True, type=int, help="Id of a PR")
-@click.option("--hostname", "-h", type=str, help="Hostname,  useful for github entrerprise with custome hostname")
+@click.option("--hostname", "-h", type=str, help="Hostname,  useful for github enterprise with custom hostname")
 @click.option("--token-path", "-t", type=str, help="Path of the file where the token is stored")
 @click.option("--format-output", "-f", type=click.Choice(["text", "json", "toml", "rich"], case_sensitive=False), default="rich", help="Format of the output")
 def main(repo, pr, hostname, token_path, format_output):
