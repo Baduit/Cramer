@@ -12,18 +12,18 @@ def print_text(result: Coal):
 	print(f"Base: {result.target_branch_name}")
 	print("Found:")
 	for found in result.commits_in_target:
-		print(f"\tsha: {found.sha} message: {found.commit.message}")
+		print(f"\tsha: {found.sha} message: {found.commit.message} url: {found.html_url}")
 
 	if result.commits_not_found:
 		print("Missing:")
 		for missing in result.commits_not_found:
-			print(f"\tsha: {missing.sha} message: {missing.commit.message}")
+			print(f"\tsha: {missing.sha} message: {missing.commit.message} url: {found.html_url}")
 
 
 
 
 def extract_commit_info(commits: Iterable[Commit]) -> List[Dict[str, str]]:
-	return [{ "sha": commit.sha, "message": commit.commit.message } for commit in commits]
+	return [{ "sha": commit.sha, "message": commit.commit.message, "url": commit.html_url } for commit in commits]
 
 
 def get_result_dict(result: Coal) -> dict:
