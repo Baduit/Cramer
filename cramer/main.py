@@ -28,7 +28,7 @@ def find_commit_equivalent_in_set(left: Commit, pr_commits: Set[Commit]) -> Comm
 		return None
 
 
-def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
+def crame(g: Github, pr_id: int, repo_name_or_id: str | int, depth: int = 200) -> Coal:
 	"""
 	Return the commits in base (target) branch corresponding to the commit from a PR
 	It is useful in case of merge rebase workflow on github because the hash of the
@@ -50,6 +50,7 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
 	found_commits_in_head = set()
 	found_commits_in_target = []
 
+	n = 0
 	for commit in repo.get_commits(target_branch.commit.sha):
 		maybe_equivalent = find_commit_equivalent_in_set(commit, pr_commits)
 		if maybe_equivalent is not None:
@@ -59,6 +60,9 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
 				break # We found all commits
 			else:
 				continue
+		n += 1
+		if n >= depth:
+			break
 
 	commits_not_found = pr_commits.difference(found_commits_in_head)
 	return Coal(
@@ -75,12 +79,13 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
 @click.option("--hostname", "-h", type=str, help="Hostname,  useful for github enterprise with custom hostname")
 @click.option("--token-path", "-t", type=str, help="Path of the file where the token is stored")
 @click.option("--format-output", "-f", type=click.Choice(["text", "json", "toml", "rich"], case_sensitive=False), default="rich", help="Format of the output")
-def main(repo, pr, hostname, token_path, format_output):
+@click.option("--depth", "-d", required=True, type=int, default=200, help="Maximum number of commit to iterate on to find the corresponding commits")
+def main(repo, pr, hostname, token_path, format_output, depth):
 	auth = Auth.Token(read_token(token_path)) if token_path else None
 	base_url = f"https://{hostname}/api/v3" if hostname else Consts.DEFAULT_BASE_URL
 
 	with Github(auth=auth, base_url=base_url) as g:
-		coal = crame(g, pr, repo)
+		coal = crame(g, pr, repo, depth)
 		if format_output == "text":
 			print_text(coal)
 		elif format_output == "json":
