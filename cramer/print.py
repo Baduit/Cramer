@@ -4,6 +4,7 @@ from typing import Dict, List
 import json
 import toml
 
+from rich import box
 from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
@@ -26,10 +27,11 @@ def print_rich(result: Coal):
 
 	commit_branch = tree.add(":memo: [bold]Commits[/bold]")
 	# Found
-	found_table = Table(show_header=True, header_style="bold green")
+	found_table = Table(show_header=True, header_style="bold green", show_lines=True)
 	found_table.add_column("Sha")
 	found_table.add_column("Commit message")
 	found_table.add_column("Github url")
+	found_table.box = box.SQUARE_DOUBLE_HEAD
 	for commit in result.commits_in_target:
 		found_table.add_row(commit.sha, commit.commit.message, f"[blue]{commit.html_url}[/blue]")
 	found_branch = commit_branch.add(":green_circle: [green]Found[/green]")
@@ -37,10 +39,11 @@ def print_rich(result: Coal):
 
 	# Missing
 	if result.commits_not_found:
-		missing_table = Table(show_header=True, header_style="bold red")
+		missing_table = Table(show_header=True, header_style="bold red", show_lines=True)
 		missing_table.add_column("Sha")
 		missing_table.add_column("Commit message")
 		missing_table.add_column("Github url")
+		missing_table.box = box.SQUARE_DOUBLE_HEAD
 		for commit in result.commits_not_found:
 			missing_table.add_row(commit.sha, commit.commit.message, f"[blue]{commit.html_url}[/blue]")
 		missing_branch = commit_branch.add(":red_circle: [red]Missing[/red]")
