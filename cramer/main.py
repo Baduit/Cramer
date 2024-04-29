@@ -11,7 +11,7 @@ from .print import print_json, print_rich, print_text, print_toml
 
 def read_token(token_path: str) -> str:
 	with open(token_path, "r") as f:
-		return f.read()
+		return f.read().strip()
 
 
 def cmp_commit(left: Commit, right: Commit) -> bool:
