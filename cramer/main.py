@@ -55,7 +55,10 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int) -> Coal:
 		if maybe_equivalent is not None:
 			found_commits_in_head.add(maybe_equivalent)
 			found_commits_in_target.append(commit)
-			continue
+			if len(found_commits_in_target) == len(pr_commits):
+				break # We found all commits
+			else:
+				continue
 
 	commits_not_found = pr_commits.difference(found_commits_in_head)
 	return Coal(
