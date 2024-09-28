@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cramer"
-version = "0.1.0"
+version = "0.2.0"
 description = "Retrieve commit between branches when using merge rebase strategy for PR"
 authors = ["Baduit"]
 license = "MIT"
