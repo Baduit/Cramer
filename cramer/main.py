@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import os
 from typing import List, Set
 
 import click
@@ -73,6 +74,15 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int, depth: int = 200) -
 	)
 
 
+def deduce_token() -> Auth.Token | None:
+	"""
+	If the token was not specified, look for the env variable GITHUB_TOKEN
+	"""
+	token = os.environ.get("GITHUB_TOKEN")
+	if token:
+		return Auth.Token(token)
+	return None
+
 @click.command()
 @click.option("--repo", "-r", required=True, type=str, help="Github repository. Example: 'Baduit/Cramer'")
 @click.option("--pr", "-p", required=True, type=int, help="Id of a PR")
@@ -81,7 +91,7 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int, depth: int = 200) -
 @click.option("--format-output", "-f", type=click.Choice(["text", "json", "toml", "rich"], case_sensitive=False), default="rich", help="Format of the output")
 @click.option("--depth", "-d", required=True, type=int, default=200, help="Maximum number of commit to iterate on to find the corresponding commits")
 def main(repo, pr, hostname, token_path, format_output, depth):
-	auth = Auth.Token(read_token(token_path)) if token_path else None
+	auth = Auth.Token(read_token(token_path)) if token_path else deduce_token()
 	base_url = f"https://{hostname}/api/v3" if hostname else Consts.DEFAULT_BASE_URL
 
 	with Github(auth=auth, base_url=base_url) as g:
