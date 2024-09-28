@@ -1,9 +1,8 @@
-from dataclasses import dataclass
 from netrc import netrc
 import os
 from pathlib import Path
 import platform
-from typing import List, Set
+from typing import Set
 
 import click
 from github import Auth, Github, Commit, Consts
