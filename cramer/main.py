@@ -1,5 +1,8 @@
 from dataclasses import dataclass
+from netrc import netrc
 import os
+from pathlib import Path
+import platform
 from typing import List, Set
 
 import click
@@ -74,14 +77,26 @@ def crame(g: Github, pr_id: int, repo_name_or_id: str | int, depth: int = 200) -
 	)
 
 
+def read_token_from_netrc_file() -> Auth.Token | None:
+	filename = ".netrc" if platform.system == "Windows" else "_netrc"
+	netrc_path = Path.home() / filename
+	if netrc_path.exists():
+		for machine, auth_data in netrc(netrc_path).hosts.items():
+			if machine == 'github.com':
+				print(auth_data)
+				_, _,  token = auth_data
+				return Auth.Token(token)
+	return None
+
+
 def deduce_token() -> Auth.Token | None:
 	"""
 	If the token was not specified, look for the env variable GITHUB_TOKEN
+	or the file ~/.netrc (~/_netrc on windows) with a machine named 'github.com'
 	"""
 	token = os.environ.get("GITHUB_TOKEN")
-	if token:
-		return Auth.Token(token)
-	return None
+	return Auth.Token(token) if token else read_token_from_netrc_file()
+
 
 @click.command()
 @click.option("--repo", "-r", required=True, type=str, help="Github repository. Example: 'Baduit/Cramer'")
